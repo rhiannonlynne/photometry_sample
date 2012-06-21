@@ -6,28 +6,35 @@ import numpy
 import pylab
 import photTools as pT
 
-filterlist = ('u', 'g', 'r', 'i', 'z', 'y')
+print "This is an example script to show uses of photTools, and also to illustrate some differences in how"
+print " we calculate magnitudes. "
+print "Instrumental magnitudes include both grey-scale and color-dependent variations as bandpasses and SEDs change."
+print "Calibrated natural magnitudes remove the grey-scale variation, and only show color-dependent/wavelength-dependent"
+print " variations in measured magnitudes as the shape of the bandpass or the shape of the SED change. "
+print "If the blue stars are used as calibration stars for the instrumental magnitudes (i.e. the zeropoint variation is"
+print " removed with the blue stars, so the grey-scale variation is removed), the changes in instrumental magnitudes then"
+print " show only the color-dependent changes in reported magnitudes. (this can be done here using matchBlue=True in calcDeltaMags)."
+print "The reason that the natural magnitudes show a small change in magnitude even for blue objects is that these are being"
+print " referenced against a flat Fnu spectrum, instead of the blue star spectrum. If matchBlue is turned on for changes in magnitudes"
+print "  calculated using natural magnitudes (calcNatMags), the results are identical to the results for changes in instrumental"
+print "  magnitudes calculated using matchBlue."
 
-# Read the bandpass files.
-lsstBP = pT.readBandpasses(filterlist=filterlist)
+
+filterlist = ('u', 'g', 'r', 'i', 'z', 'y')
 
 # Read the SED files.
 seds, sedlists = pT.readPhotSeds(sedDir='../')
 
-# And redshift the galaxies, quasar, and SN
+# And redshift the galaxies, quasar, and SN.
+# These are just sample redshifts, not supposed to be 'typical'. 
 redshifts = {}
 redshifts['galaxies'] = numpy.array([0.5, 1.0], 'float')
 redshifts['quasar'] = numpy.array([1.0, 1.5, 2.5], 'float')
 redshifts['sn'] = numpy.array([0.3, 0.8, 1.2, 1.5], 'float')
 seds, sedlists = pT.makeRedshiftedSeds(seds, sedlists, redshifts)
 
-# Calculate magnitudes for all the objects in this bandpass set.
-mags = pT.calcMags(lsstBP, seds, sedlists)
-
-########
-
-# Okay, now let's do something a little cooler - let's look
-#  at a comparison case, where we will replace the filter throughputs with a shifted version.
+# Okay, now let's look at two different bandpass comparisons. 
+# We will compare the 'normal' base throughputs to a set of throughputs where the bandpasses are shifted by 1%.
 # First read the basic components, except for the filters.
 componentList_common = ['atmos.dat', 'detector.dat', 'lens1.dat', 'lens2.dat', 'lens3.dat',
                         'm1_ProtAl_Aged.dat', 'm2_ProtAl_Aged.dat', 'm3_ProtAl_Aged.dat']
@@ -40,7 +47,7 @@ componentList_filter = ['filter_u.dat', 'filter_g.dat', 'filter_r.dat', 'filter_
 lsst_filters = pT.buildBandpasses(filterlist=filterlist, componentList_common=None,
                                   componentList_filter = componentList_filter, filterDir='../throughputs/baseline')
 
-# Now multiply the base with the filters.
+# Now multiply the base with the filters, for the 'standard' ('normal') set. 
 lsst_std = pT.multiplyBandpassDict(lsst_base, lsst_filters)
 
 # And also generate a 'shifted' version of the filters, shifting by 1% times the effective wavelength of each filter.
@@ -54,43 +61,33 @@ for f in filterlist:
     # Resynchronize and rebin the wavelengths / transmission curve of the filter.
     lsst_filters[f].resampleBandpass()
 
-# Then apply these shifted filters to the same base throughput set.
+# Then apply these shifted filters to the same base throughput set, to get our 'shifted' bandpasses.
 lsst_shifted = pT.multiplyBandpassDict(lsst_base, lsst_filters)
 
-# Calculate the magnitudes in each of these bandpasses.
-mags_std = pT.calcMags(lsst_std, seds, sedlists)
-mags_shifted = pT.calcMags(lsst_shifted, seds, sedlists)
+# Calculate the magnitudes in each of these bandpasses, first including all effects (greyscale and color-dependent).
+mags_std = pT.calcInstMags(lsst_std, seds, sedlists)
+mags_shifted = pT.calcInstMags(lsst_shifted, seds, sedlists)
+# And calculate the differences, matching the blue stars in each bandpass.
+dmags = pT.calcDeltaMags(mags_std, mags_shifted, mmags=True, matchBlue=False)
 
-# And look at the difference in magnitude between each type of bandpass.
-# Note that the magnitudes calculated at this point are 'zero-point calibrated' natural magnitudes:
-# that is, they include the zeropoint of the system so absorb any grey-scale variation and
-# only leave the color or wavelength-dependent changes in the natural magnitude due to the fact that
-# the bandpass itself has changed.
-
-dmags = pT.calcDeltaMags(mags_std, mags_shifted, matchBlue=False)
-
-print 'Delta mmag:'
-writestring = "object"
-for f in filterlist:
-    writestring += '\t %s ' %(f)
-print writestring
-for objtype in sedlists.keys():
-    print 'Object type: ', objtype
-    for s in sedlists[objtype]:
-        writestring = 'dm %s ' %(s)
-        for f in filterlist:
-            writestring += ' %f ' %(dmags[s][f])
-        print writestring
-
-
-
+print_to_screen = False
+if print_to_screen:
+    print 'Delta mmag:'
+    writestring = "object"
+    for f in filterlist:
+        writestring += '\t %s ' %(f)
+    print writestring
+    for objtype in sedlists.keys():
+        print 'Object type: ', objtype
+        for s in sedlists[objtype]:
+            writestring = 'dm %s ' %(s)
+            for f in filterlist:
+                writestring += ' %f ' %(dmags[s][f])
+            print writestring
 # And generate a plot.
-
 symbs = {'quasar':'o', 'stars':'s', 'sn':'x', 'galaxies':'+'}
 colors = {'quasar':'g', 'stars':'k', 'sn':'b', 'galaxies':'r'}
-
 gi = pT.calcGiColors(mags_std)
-
 pylab.figure()
 pylab.subplots_adjust(top=0.93, wspace=0.32, hspace=0.32, bottom=0.09, left=0.12, right=0.96)
 for f, i in zip(filterlist, range(1, len(filterlist)+1)):
@@ -100,5 +97,84 @@ for f, i in zip(filterlist, range(1, len(filterlist)+1)):
             pylab.plot(gi[s], dmags[s][f], color=colors[objtype], marker=symbs[objtype])
     pylab.xlabel('g-i')
     pylab.ylabel(r'$\Delta$%s (mmag)' %(f))
+pylab.suptitle('Instrumental Mags')
+
+# And then let's do the same thing, but calculate the delta mags while matching the magnitudes of the blue stars
+# in each bandpass. (this is essentially removing the grey-scale effects, but comparing the color-dependent effects
+# compared to a blue stellar SED, since those are the objects which provide the zeropoint scale). 
+
+# And calculate the differences, matching the blue stars in each bandpass.                                                             
+dmags = pT.calcDeltaMags(mags_std, mags_shifted, mmags=True, matchBlue=True)
+
+print_to_screen = False
+if print_to_screen:
+    print 'Delta mmag:'
+    writestring = "object"
+    for f in filterlist:
+        writestring += '\t %s ' %(f)
+    print writestring
+    for objtype in sedlists.keys():
+        print 'Object type: ', objtype
+        for s in sedlists[objtype]:
+            writestring = 'dm %s ' %(s)
+            for f in filterlist:
+                writestring += ' %f ' %(dmags[s][f])
+            print writestring
+# And generate a plot.                                                                                                                
+symbs = {'quasar':'o', 'stars':'s', 'sn':'x', 'galaxies':'+'}
+colors = {'quasar':'g', 'stars':'k', 'sn':'b', 'galaxies':'r'}
+gi = pT.calcGiColors(mags_std)
+pylab.figure()
+pylab.subplots_adjust(top=0.93, wspace=0.32, hspace=0.32, bottom=0.09, left=0.12, right=0.96)
+for f, i in zip(filterlist, range(1, len(filterlist)+1)):
+    pylab.subplot(3,2,i)
+    for objtype in sedlists.keys():
+        for s in sedlists[objtype]:
+            pylab.plot(gi[s], dmags[s][f], color=colors[objtype], marker=symbs[objtype])
+    pylab.xlabel('g-i')
+    pylab.ylabel(r'$\Delta$%s (mmag)' %(f))
+pylab.suptitle('Instrumental Mags, Blue Matched')
+
+
+
+# And let's do the same thing, only generate natural magnitudes (removing the grey-scale effect and leaving only
+# color-dependent terms ... but note that this is now 'color-dependent' vs. a flat Fnu SED). 
+
+# Calculate the magnitudes in each of these bandpasses, first including all effects (greyscale and color-dependent).                  
+mags_std = pT.calcNatMags(lsst_std, seds, sedlists)
+mags_shifted = pT.calcNatMags(lsst_shifted, seds, sedlists)
+# And calculate the differences, matching the blue stars in each bandpass.                                                         
+dmags = pT.calcDeltaMags(mags_std, mags_shifted, mmags=True, matchBlue=False)
+
+print_to_screen = False
+if print_to_screen:
+    print 'Delta mmag:'
+    writestring = "object"
+    for f in filterlist:
+        writestring += '\t %s ' %(f)
+    print writestring
+    for objtype in sedlists.keys():
+        print 'Object type: ', objtype
+        for s in sedlists[objtype]:
+            writestring = 'dm %s ' %(s)
+            for f in filterlist:
+                writestring += ' %f ' %(dmags[s][f])
+            print writestring
+# And generate a plot.                                                                                                                 
+symbs = {'quasar':'o', 'stars':'s', 'sn':'x', 'galaxies':'+'}
+colors = {'quasar':'g', 'stars':'k', 'sn':'b', 'galaxies':'r'}
+gi = pT.calcGiColors(mags_std)
+pylab.figure()
+pylab.subplots_adjust(top=0.93, wspace=0.32, hspace=0.32, bottom=0.09, left=0.12, right=0.96)
+for f, i in zip(filterlist, range(1, len(filterlist)+1)):
+    pylab.subplot(3,2,i)
+    for objtype in sedlists.keys():
+        for s in sedlists[objtype]:
+            pylab.plot(gi[s], dmags[s][f], color=colors[objtype], marker=symbs[objtype])
+    pylab.xlabel('g-i')
+    pylab.ylabel(r'$\Delta$%s (mmag)' %(f))
+pylab.suptitle('Natural Magnitudes')
 pylab.show()
 
+# Note that if we repeated the natural magnitudes plot, after doing a scaling so that the blue stars were the same 
+# magnitude in each bandpass, we would see the SAME result as when doing this with the InstMag values. 

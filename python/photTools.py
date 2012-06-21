@@ -12,6 +12,17 @@ from Bandpass import Bandpass
 # SEDs, but for the few which are stored within the photometry_sample directories, this works well.
 
 
+EXPTIME = 15                      # Default exposure time. (option for method calls).                   
+NEXP = 2                          # Default number of exposures. (option for methods).                                                  
+EFFAREA = numpy.pi*(6.5*100/2.0)**2   # Default effective area of primary mirror. (option for methods).                                
+GAIN = 2.3                        # Default gain. (option for method call).                                                            
+RDNOISE = 5                       # Default value - readnoise electrons or adu per pixel (per exposure)                                 
+DARKCURRENT = 0.2                 # Default value - dark current electrons or adu per pixel per second                                  
+OTHERNOISE = 4.69                 # Default value - other noise electrons or adu per pixel per exposure                                 
+PLATESCALE = 0.2                  # Default value - "/pixel                                                                             
+SEEING = {'u': 0.77, 'g':0.73, 'r':0.70, 'i':0.67, 'z':0.65, 'y':0.63}  # Default seeing values (in ")     
+
+
 def readBandpasses(filterlist=('u', 'g', 'r', 'i', 'z', 'y'),
                    filterDir = None,
                    prefix = 'total_', suffix='.dat'):
@@ -193,9 +204,9 @@ def redshiftSingleSED(sed_in, z):
     sed_out.redshiftSED(z)
     return sed_out
 
-def calcMags(bandpassDict, sedDict, sedlists):
-    """Calculate (zeropoint-calibrated) magnitudes for each type of object,
-    in all bandpasses. """
+def calcNatMags(bandpassDict, sedDict, sedlists):
+    """Calculate (zeropoint-calibrated) natural magnitudes for each SED,
+    in all bandpasses. Changes in this magnitude includes only color/wavelength-dependent effects. """
     # Create a dictionary to hold all of the magnitude information, for all filters.
     mags = {}
     # Loop over SEDs:
@@ -206,6 +217,19 @@ def calcMags(bandpassDict, sedDict, sedlists):
             for f in bandpassDict.keys():
                 # Calculate the magnitudes. 
                 mags[s][f] = sedDict[s].calcMag(bandpassDict[f])
+    return mags
+
+def calcInstMags(bandpassDict, sedDict, sedlists, 
+                 expTime=EXPTIME, effarea=EFFAREA, gain=GAIN):
+    """Calculate instrumental magnitudes for each SED, in all bandpasses. 
+    Changes in this magnitude includes gray-scale effects as well as color/wavelength dependent effects. """
+    mags = {}
+    for o in sedlists.keys():
+        for s in sedlists[o]:
+            mags[s] = {}
+            for f in bandpassDict.keys():
+                mags[s][f] = sedDict[s].calcADU(bandpassDict[f], expTime=expTime, gain=gain, effarea=effarea)
+                mags[s][f] = -2.5*numpy.log10(mags[s][f])
     return mags
 
 
