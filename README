@@ -1,3 +1,16 @@
+Primarily this package is intended to make comparisons of different throughput curves easier and more efficient
+for the LSST engineering teams. 
+
+See what the package can do : 
+ source phot_ref.csh
+ cd python
+ python example.py
+Then read the photTools.py and example.py to see how to use these tools for your own needs.
+
+This is a work in progress; feedback is welcomed and new tools will be added as needed.
+
+---
+
 This photometry_reference directory contains:
 
 - ** 4 subdirectories containing a sample of reference SEDs, chosen 
