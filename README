@@ -1,0 +1,48 @@
+This photometry_reference directory contains:
+
+- ** 4 subdirectories containing a sample of reference SEDs, chosen 
+to represent a range of different types of SEDs suitable for addresing
+various calibration questions.  These four subdirectories are: 
+
+- galaxies (.. more details coming .. these are composites I got from AndyC)
+- quasar (containing a single quasar SED which has been generated 
+	by combining a composite spectrum from 2204 QSO spectra 
+	from SDSS (vanden Berk et al) with a simple model for the
+	flux behavior beyond the SDSS wavelengths (by Ivezic)).
+- sn (containing SN SEDs at various points in their time evolution, 
+	these comes from the SN templates created by Peter Nugent),
+- stars (containing several stars from blue to red -- km10_7250.fits_g45 
+  	being the bluest and equivalent to about an F0 type main sequence
+	star [7250 indicates its effective temperature .. hotter=bluer],
+	down to the m3.0Full.dat SED which represents a red Mdwarf.
+	The Kurucz models come from Kurucz 1993, while the Mdwarf is
+	a composite empirical spectra from SDSS extended in wavelength
+	by other observations.)
+
+In each SED file, there may or may not be a header line starting with '#', 
+but the data is always contained in columns of wavelength (in nm) and 
+flux - 'Flambda' specified, that is, in units of ergs/cm^s/s/nm, although
+the flux is arbitrarily scaled (that is, the SEDs are not 
+photometrically pre-scaled to any particular magnitude). 
+
+- throughputs ** A subdirectory containing a copy of the LSST package
+'throughputs'.  This contains a copy (current as of the time this
+package was uploaded) of sample LSST response curves, as well as
+response curves for a sample of other telescopes. You can substitute
+and use your own throughput curves, of course, but these are provided
+for convenience.
+
+
+- python ** A subdirectory containing some sample python programs
+which can be used as tools to help you work with these SEDs. These
+programs are mostly a copy of the tools available in the LSST package
+'catalogs_measures', but are provided here for convience.  Some
+additional code has been provided here in photTools to serve as a
+demonstration of how to use the Sed/Bandpasses classes and to provide
+convenience functions (just import photTools into python, and voila).
+
+- the file 'phot_ref.csh' which, if sourced, sets some environment variables
+that portions of the python code, photTools.py, take advantage of. 
+
+
+Questions, comments, please contact ljones@astro.washington.edu
