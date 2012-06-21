@@ -93,7 +93,7 @@ pT.plotDmags(sedlists, gi, dmags, titletext='Instrumental Mags, Blue Matched')
 
 
 # And let's do the same thing, only generate natural magnitudes (removing the grey-scale effect and leaving only
-# color-dependent terms ... but note that this is now 'color-dependent' vs. a flat Fnu SED). 
+# color-dependent terms ... but note that this is now 'color-dependent' compared to a flat Fnu SED, rather than a blue SED). 
 
 # Calculate the magnitudes in each of these bandpasses, first including all effects (greyscale and color-dependent).                  
 mags_std = pT.calcNatMags(lsst_std, seds, sedlists)
