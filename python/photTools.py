@@ -1,6 +1,7 @@
 import os
 from copy import deepcopy
 import numpy
+import pylab
 from Sed import Sed
 from Bandpass import Bandpass
 
@@ -11,6 +12,7 @@ from Bandpass import Bandpass
 # Note that the way these functions are set up is not optimal for large numbers of
 # SEDs, but for the few which are stored within the photometry_sample directories, this works well.
 
+figformat = 'png'
 
 EXPTIME = 15                      # Default exposure time. (option for method calls).                   
 NEXP = 2                          # Default number of exposures. (option for methods).                                                  
@@ -238,7 +240,6 @@ def calcDeltaMags(mags1, mags2, mmags=True, matchBlue=False):
     If 'mmags' is True, then returns delta mags in mmags. 
     If 'matchBlue' is True, then scales change in magnitude between mags1 and mags2 so that the blue 
      star 'km10_7250.fits_g45' has zero magnitude change."""
-    # Convenience function.
     dmags_seds = list(set(mags1) & set(mags2))
     s = mags1.keys()[0]
     dmags_filters = list(set(mags1[s]) & set(mags2[s]))
@@ -268,3 +269,44 @@ def calcGiColors(mags):
     for s in mags.keys():
         gi[s] = mags[s]['g'] - mags[s]['i']
     return gi
+
+
+def printDmags(sedlists, dmags, filterlist=('u', 'g', 'r', 'i', 'z', 'y')):
+    """Print changes in magnitudes to the screen."""
+    print 'Delta mmag:'
+    writestring = "object"
+    for f in filterlist:
+        writestring += '\t %s ' %(f)
+    print writestring
+    for objtype in sedlists.keys():
+        print 'Object type: ', objtype
+        for s in sedlists[objtype]:
+            writestring = 'dm %s ' %(s)
+            for f in filterlist:
+                writestring += ' %f ' %(dmags[s][f])
+            print writestring
+    return
+
+
+def plotDmags(sedlists, gi, dmags, newfig=True, titletext=None, savefig=False,
+              filterlist=('u', 'g', 'r', 'i', 'z', 'y')):
+    """Generate a plot of the change in magnitudes. """
+    symbs = {'quasar':'o', 'stars':'s', 'sn':'x', 'galaxies':'+'}
+    colors = {'quasar':'g', 'stars':'k', 'sn':'b', 'galaxies':'r'}
+    if newfig:
+        pylab.figure()
+    pylab.subplots_adjust(top=0.93, wspace=0.32, hspace=0.32, bottom=0.09, left=0.12, right=0.96)
+    for f, i in zip(filterlist, range(1, len(filterlist)+1)):
+        pylab.subplot(3,2,i)
+        for objtype in sedlists.keys():
+            for s in sedlists[objtype]:
+                pylab.plot(gi[s], dmags[s][f], color=colors[objtype], marker=symbs[objtype])
+        pylab.xlabel('g-i')
+        pylab.ylabel(r'$\Delta$%s (mmag)' %(f))
+    pylab.suptitle(titletext)
+    if savefig:
+        if titletext != None:
+            pylab.savefig('%s.%s' %(titletext, figformat), format=figformat)
+        else:
+            pylab.savefig('Dmag.%s' %(figformat), format=figformat)
+    return

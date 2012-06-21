@@ -72,32 +72,10 @@ dmags = pT.calcDeltaMags(mags_std, mags_shifted, mmags=True, matchBlue=False)
 
 print_to_screen = False
 if print_to_screen:
-    print 'Delta mmag:'
-    writestring = "object"
-    for f in filterlist:
-        writestring += '\t %s ' %(f)
-    print writestring
-    for objtype in sedlists.keys():
-        print 'Object type: ', objtype
-        for s in sedlists[objtype]:
-            writestring = 'dm %s ' %(s)
-            for f in filterlist:
-                writestring += ' %f ' %(dmags[s][f])
-            print writestring
+    pT.printDmags(sedlists, dmags)
 # And generate a plot.
-symbs = {'quasar':'o', 'stars':'s', 'sn':'x', 'galaxies':'+'}
-colors = {'quasar':'g', 'stars':'k', 'sn':'b', 'galaxies':'r'}
 gi = pT.calcGiColors(mags_std)
-pylab.figure()
-pylab.subplots_adjust(top=0.93, wspace=0.32, hspace=0.32, bottom=0.09, left=0.12, right=0.96)
-for f, i in zip(filterlist, range(1, len(filterlist)+1)):
-    pylab.subplot(3,2,i)
-    for objtype in sedlists.keys():
-        for s in sedlists[objtype]:        
-            pylab.plot(gi[s], dmags[s][f], color=colors[objtype], marker=symbs[objtype])
-    pylab.xlabel('g-i')
-    pylab.ylabel(r'$\Delta$%s (mmag)' %(f))
-pylab.suptitle('Instrumental Mags')
+pT.plotDmags(sedlists, gi, dmags, titletext ='Instrumental Mags')
 
 # And then let's do the same thing, but calculate the delta mags while matching the magnitudes of the blue stars
 # in each bandpass. (this is essentially removing the grey-scale effects, but comparing the color-dependent effects
@@ -108,32 +86,9 @@ dmags = pT.calcDeltaMags(mags_std, mags_shifted, mmags=True, matchBlue=True)
 
 print_to_screen = False
 if print_to_screen:
-    print 'Delta mmag:'
-    writestring = "object"
-    for f in filterlist:
-        writestring += '\t %s ' %(f)
-    print writestring
-    for objtype in sedlists.keys():
-        print 'Object type: ', objtype
-        for s in sedlists[objtype]:
-            writestring = 'dm %s ' %(s)
-            for f in filterlist:
-                writestring += ' %f ' %(dmags[s][f])
-            print writestring
+    pT.printDmags(sedlists, dmags)
 # And generate a plot.                                                                                                                
-symbs = {'quasar':'o', 'stars':'s', 'sn':'x', 'galaxies':'+'}
-colors = {'quasar':'g', 'stars':'k', 'sn':'b', 'galaxies':'r'}
-gi = pT.calcGiColors(mags_std)
-pylab.figure()
-pylab.subplots_adjust(top=0.93, wspace=0.32, hspace=0.32, bottom=0.09, left=0.12, right=0.96)
-for f, i in zip(filterlist, range(1, len(filterlist)+1)):
-    pylab.subplot(3,2,i)
-    for objtype in sedlists.keys():
-        for s in sedlists[objtype]:
-            pylab.plot(gi[s], dmags[s][f], color=colors[objtype], marker=symbs[objtype])
-    pylab.xlabel('g-i')
-    pylab.ylabel(r'$\Delta$%s (mmag)' %(f))
-pylab.suptitle('Instrumental Mags, Blue Matched')
+pT.plotDmags(sedlists, gi, dmags, titletext='Instrumental Mags, Blue Matched')
 
 
 
@@ -148,32 +103,11 @@ dmags = pT.calcDeltaMags(mags_std, mags_shifted, mmags=True, matchBlue=False)
 
 print_to_screen = False
 if print_to_screen:
-    print 'Delta mmag:'
-    writestring = "object"
-    for f in filterlist:
-        writestring += '\t %s ' %(f)
-    print writestring
-    for objtype in sedlists.keys():
-        print 'Object type: ', objtype
-        for s in sedlists[objtype]:
-            writestring = 'dm %s ' %(s)
-            for f in filterlist:
-                writestring += ' %f ' %(dmags[s][f])
-            print writestring
-# And generate a plot.                                                                                                                 
-symbs = {'quasar':'o', 'stars':'s', 'sn':'x', 'galaxies':'+'}
-colors = {'quasar':'g', 'stars':'k', 'sn':'b', 'galaxies':'r'}
+    pT.printDmags(sedlists, dmags)
+# And generate a plot.            
 gi = pT.calcGiColors(mags_std)
-pylab.figure()
-pylab.subplots_adjust(top=0.93, wspace=0.32, hspace=0.32, bottom=0.09, left=0.12, right=0.96)
-for f, i in zip(filterlist, range(1, len(filterlist)+1)):
-    pylab.subplot(3,2,i)
-    for objtype in sedlists.keys():
-        for s in sedlists[objtype]:
-            pylab.plot(gi[s], dmags[s][f], color=colors[objtype], marker=symbs[objtype])
-    pylab.xlabel('g-i')
-    pylab.ylabel(r'$\Delta$%s (mmag)' %(f))
-pylab.suptitle('Natural Magnitudes')
+pT.plotDmags(sedlists, gi, dmags, titletext='Natural Magnitudes')
+
 pylab.show()
 
 # Note that if we repeated the natural magnitudes plot, after doing a scaling so that the blue stars were the same 
