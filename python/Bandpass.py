@@ -26,7 +26,7 @@ Methods:
 
 """
 import os
-import warnings as warning
+import warnings
 import numpy
 import gzip
 import Sed  # For ZP_t and M5 calculations. And for 'fast mags' calculation. 
@@ -112,7 +112,7 @@ class Bandpass:
         # Check for filename error. 
         # If given list of filenames, pass to (and return from) readThroughputList.
         if isinstance(filename, list):  
-            raise warning.warn("Was given list of files, instead of a single file. Using readThroughputList instead")
+            warnings.warn("Was given list of files, instead of a single file. Using readThroughputList instead")
             self.readThroughputList(componentList=filename, 
                                     wavelen_min=wavelen_min, wavelen_max=wavelen_max, 
                                     wavelen_step=wavelen_step)
