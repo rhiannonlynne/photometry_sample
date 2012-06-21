@@ -64,6 +64,10 @@ for f in filterlist:
 # Then apply these shifted filters to the same base throughput set, to get our 'shifted' bandpasses.
 lsst_shifted = pT.multiplyBandpassDict(lsst_base, lsst_filters)
 
+# Plot the transmission curves. 
+pT.plotBandpasses(lsst_std, newfig=True, addlegend=True)
+pT.plotBandpasses(lsst_shifted, newfig=False, addlegend=False, titletext='Shifted and non-shifted LSST Bandpasses', linestyle=':')
+
 # Calculate the magnitudes in each of these bandpasses, first including all effects (greyscale and color-dependent).
 mags_std = pT.calcInstMags(lsst_std, seds, sedlists)
 mags_shifted = pT.calcInstMags(lsst_shifted, seds, sedlists)

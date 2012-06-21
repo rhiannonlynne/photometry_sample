@@ -108,6 +108,38 @@ def multiplyBandpassDict(bandpassDict1, bandpassDict2):
     return bandpassDict_new
 
 
+def plotBandpasses(bandpassDict, titletext=None, newfig=True, savefig=False, addlegend=True,
+                   linestyle='-', linewidth=2):
+    """Plot the bandpass throughput curves. """
+    # Generate a new figure, if desired. 
+    if newfig: 
+        pylab.figure()
+    # Plot the bandpass curves. 
+    for f in bandpassDict.keys():
+        pylab.plot(bandpassDict[f].wavelen, bandpassDict[f].sb, marker="", linestyle=linestyle, 
+                   linewidth=linewidth, label=f)
+    # Only draw the legend if desired (many bandpassDicts plotted together could make the legend unwieldy).
+    if addlegend:
+        pylab.legend(numpoints=1, fancybox=True, shadow=True)
+    # Limit wavelengths to the LSST range. 
+    pylab.xlim(300, 1150)
+    pylab.xlabel('Wavelength (nm)')
+    pylab.ylabel('Throughput')
+    if newfig:
+        # Only add the grid if it's a new figure (otherwise, it toggles on/off).
+        pylab.grid()
+    # Add a plot title.
+    if titletext != None:
+        pylab.title(titletext)
+    # Save the figure, if desired.
+    if savefig:
+        if titletext!=None:
+            pylab.savefig('%s.%s' %(titletext, figformat), format=figformat)
+        else:
+            pylab.savefig('throughputs.%s' %(titletext, figformat), format=figformat)
+    return
+        
+
 def readPhotSeds(sedDir=None):
     """Read all the seds provided by this package, storing them in a
     dictionary and saving lists of the SEDs of each type (so that
