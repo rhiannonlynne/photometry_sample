@@ -43,6 +43,3 @@ convenience functions (just import photTools into python, and voila).
 
 - the file 'phot_ref.csh' which, if sourced, sets some environment variables
 that portions of the python code, photTools.py, take advantage of. 
-
-
-Questions, comments, please contact ljones@astro.washington.edu
