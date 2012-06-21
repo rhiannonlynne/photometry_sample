@@ -8,6 +8,9 @@ from Bandpass import Bandpass
 # functionality that seemed like it would be useful in engineering tests.
 # Please feel free to add to this or to send me suggestions. 
 
+# Note that the way these functions are set up is not optimal for large numbers of
+# SEDs, but for the few which are stored within the photometry_sample directories, this works well.
+
 
 def readBandpasses(filterlist=('u', 'g', 'r', 'i', 'z', 'y'),
                    filterDir = None,
@@ -92,7 +95,7 @@ def multiplyBandpassDict(bandpassDict1, bandpassDict2):
     return bandpassDict_new
 
 
-def readAllSeds(sedDir=None):
+def readPhotSeds(sedDir=None):
     """Read all the seds provided by this package, storing them in a
     dictionary and saving lists of the SEDs of each type (so that
     they can be separated later if desired). """
@@ -125,6 +128,27 @@ def readAllSeds(sedDir=None):
     # Return the sed dictionary and the dictionary containing the lists of each
     #  type of object. 
     return sedDict, sedlists
+
+def readAnySeds(inputfileList, sedDir=None):
+    """Read the seds in a list and store them in a format appropriate for use with the 
+    rest of these routines. sedDir (if set) can be the root directory for the files in the list."""
+    # Set up the sedlists dictionary to hold the sed names. We'll store them all keyed under 'any'. 
+    sedlists = {}
+    sedlists['any'] = deepcopy(inputfileList)
+    # If the root directory is set, add it to the input file names. 
+    if sedDir != None:
+        ifiles = []    
+        for i in inputfileList:
+            ifiles.append(os.path.join(sedDir, i))
+        inputfileList = ifiles
+    # Read the files.
+    sedDict = {} 
+    for filename, s in zip(inputfileList, sedlists['any']):
+        sedDict[s] = Sed()
+        sedDict[s].readSED_flambda(filename)
+    # Return the sed dictionary and the dictionary containing the lists of each type of object.
+    return sedDict, sedlists
+
 
 def makeRedshiftedSeds(sedDict, sedlists, redshifts):
     """Redshift the quasar, galaxies and SN by the amounts given in redshifts.
@@ -185,8 +209,11 @@ def calcMags(bandpassDict, sedDict, sedlists):
     return mags
 
 
-def calcDeltaMags(mags1, mags2, mmags=True):
-    """Calculate the difference in magnitudes between two sets of magnitudes, mags calculated as above."""
+def calcDeltaMags(mags1, mags2, mmags=True, matchBlue=False):
+    """Calculate the difference in magnitudes between two sets of magnitudes, mags calculated as above.
+    If 'mmags' is True, then returns delta mags in mmags. 
+    If 'matchBlue' is True, then scales change in magnitude between mags1 and mags2 so that the blue 
+     star 'km10_7250.fits_g45' has zero magnitude change."""
     # Convenience function.
     dmags_seds = list(set(mags1) & set(mags2))
     s = mags1.keys()[0]
@@ -196,9 +223,19 @@ def calcDeltaMags(mags1, mags2, mmags=True):
         dmags[s] = {}
         for f in dmags_filters:
             dmags[s][f] = mags1[s][f] - mags2[s][f]
-            # Convert to millimags?
+            # Convert to millimags if desired.
             if mmags:
                 dmags[s][f] *= 1000.0
+    # Apply scaling so that bluest star remains constant, if desired. 
+    if matchBlue:
+        # Calculate offset to apply.
+        offset = {}
+        for f in dmags_filters:
+            offset[f] = dmags['km10_7250.fits_g45'][f]
+        # Apply offset.
+        for s in dmags_seds:
+            for f in dmags_filters:
+                dmags[s][f] = dmags[s][f] - offset[f]
     return dmags
 
 def calcGiColors(mags):

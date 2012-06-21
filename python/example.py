@@ -12,7 +12,7 @@ filterlist = ('u', 'g', 'r', 'i', 'z', 'y')
 lsstBP = pT.readBandpasses(filterlist=filterlist)
 
 # Read the SED files.
-seds, sedlists = pT.readAllSeds(sedDir='../')
+seds, sedlists = pT.readPhotSeds(sedDir='../')
 
 # And redshift the galaxies, quasar, and SN
 redshifts = {}
@@ -67,7 +67,7 @@ mags_shifted = pT.calcMags(lsst_shifted, seds, sedlists)
 # only leave the color or wavelength-dependent changes in the natural magnitude due to the fact that
 # the bandpass itself has changed.
 
-dmags = pT.calcDeltaMags(mags_std, mags_shifted)
+dmags = pT.calcDeltaMags(mags_std, mags_shifted, matchBlue=False)
 
 print 'Delta mmag:'
 writestring = "object"
@@ -86,7 +86,7 @@ for objtype in sedlists.keys():
 
 # And generate a plot.
 
-symbs = {'quasar':'s', 'stars':'o', 'sn':'x', 'galaxies':'+'}
+symbs = {'quasar':'o', 'stars':'s', 'sn':'x', 'galaxies':'+'}
 colors = {'quasar':'g', 'stars':'k', 'sn':'b', 'galaxies':'r'}
 
 gi = pT.calcGiColors(mags_std)
