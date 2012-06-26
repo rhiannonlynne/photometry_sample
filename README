@@ -1,5 +1,5 @@
-Primarily this package is intended to make comparisons of different throughput curves easier and more efficient
-for the LSST engineering teams. 
+Primarily this package is intended to make comparisons of different throughput curves 
+easier and more efficient for the LSST engineering teams. 
 
 See what the package can do : 
  source phot_ref.csh
@@ -13,11 +13,14 @@ This is a work in progress; feedback is welcomed and new tools will be added as 
 
 This photometry_reference directory contains:
 
-- ** 4 subdirectories containing a sample of reference SEDs, chosen 
+- ** 5 subdirectories containing a sample of reference SEDs, chosen 
 to represent a range of different types of SEDs suitable for addresing
 various calibration questions.  These four subdirectories are: 
 
 - galaxies (.. more details coming .. these are composites I got from AndyC)
+- photoZ_outliers (containing galaxy templates which are most likely to
+        result in catastrophic failures in determining redshifts 
+	using photo-Z techniques. Templates provided by Sam Schmidt, via Tony). 
 - quasar (containing a single quasar SED which has been generated 
 	by combining a composite spectrum from 2204 QSO spectra 
 	from SDSS (vanden Berk et al) with a simple model for the

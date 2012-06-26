@@ -31,6 +31,7 @@ redshifts = {}
 redshifts['galaxies'] = numpy.array([0.5, 1.0], 'float')
 redshifts['quasar'] = numpy.array([1.0, 1.5, 2.5], 'float')
 redshifts['sn'] = numpy.array([0.3, 0.8, 1.2, 1.5], 'float')
+redshifts['photoZ_outliers'] = numpy.array([0, 0.2, 2.0], 'float')
 seds, sedlists = pT.makeRedshiftedSeds(seds, sedlists, redshifts)
 
 # Okay, now let's look at two different bandpass comparisons. 

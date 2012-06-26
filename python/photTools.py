@@ -162,6 +162,9 @@ def readPhotSeds(sedDir=None):
     sedlists['sn'] = ['sn1a_15.0.dat', 'sn1a_20.0.dat', 'sn1a_10.0.dat']
     sedlists['galaxies'] = ['Sa_template_norm.sed.dat', 'Sdm_template_norm.sed0.dat',
                             'Ell2_template_norm.sed.dat']
+    sedlists['photoZ_outliers'] = ['xspec_172.sed.dat', 'xspec_173.sed.dat',
+                                   'xspec_175.sed.dat', 'xspec_176.sed.dat',
+                                   'xspec_90.sed.dat', 'xspec_91.sed.dat']
     # Let's go read the files.
     sedDict = {}
     # Loop through quasar, stars, galaxies, sn in the sedlist dictionary.
@@ -323,8 +326,8 @@ def printDmags(sedlists, dmags, filterlist=('u', 'g', 'r', 'i', 'z', 'y')):
 def plotDmags(sedlists, gi, dmags, newfig=True, titletext=None, savefig=False,
               filterlist=('u', 'g', 'r', 'i', 'z', 'y')):
     """Generate a plot of the change in magnitudes. """
-    symbs = {'quasar':'o', 'stars':'s', 'sn':'x', 'galaxies':'+'}
-    colors = {'quasar':'g', 'stars':'k', 'sn':'b', 'galaxies':'r'}
+    symbs = {'quasar':'o', 'stars':'s', 'sn':'x', 'galaxies':'+', 'photoZ_outliers':'*', 'any':'^'}
+    colors = {'quasar':'g', 'stars':'k', 'sn':'b', 'galaxies':'r', 'photoZ_outliers':'m', 'any':'k'}
     if newfig:
         pylab.figure()
     pylab.subplots_adjust(top=0.93, wspace=0.32, hspace=0.32, bottom=0.09, left=0.12, right=0.96)
