@@ -1,0 +1,190 @@
+\documentclass[12pt,preprint]{aastex}
+\usepackage{url}
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{subfig}
+\usepackage{fixltx2e}
+\usepackage{hyperref}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% author-defined commands
+\newcommand\x         {\hbox{$\times$}}
+\def\mic              {\hbox{$\mu{\rm m}$}}
+\def\about            {\hbox{$\sim$}}
+\def\Mo               {\hbox{$M_{\odot}$}}
+\def\Lo               {\hbox{$L_{\odot}$}}
+\newcommand{\water}   {H\textsubscript{2}O}
+\newcommand{\ozone}    {O\textsubscript{3}}
+\newcommand{\oxy}     {O\textsubscript{2}}
+\newcommand{\lsst}   {_{LSST}}
+
+%\captionsetup[figure]{labelformat=simple}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+\title{Magnitude Definitions}
+\author{Lynne Jones}
+
+\begin{abstract}
+This short document will help serve to clarify the definitions of `magnitudes' 
+introduced in the code attached, providing the equations that define `instrumental magnitude' 
+and `natural magnitude'. 
+\end{abstract}
+
+\section{Introduction}
+
+First let's consider the underlying quantity we want to extract from our observations: 
+$F_\nu(\lambda, t)$\footnote{Hereafter, the units for specific
+flux are Jansky (1 Jy = 10$^{-23}$ erg cm$^{-2}$ s$^{-1}$
+Hz$^{-1}$). The choice of $F_\nu$ vs. $F_\lambda$ makes the flux
+conversion to the AB magnitude scale more transparent, and the choice
+of $\lambda$ as the running variable is more convenient than the
+choice of $\nu$. Note also, while $F_\nu(\lambda,t)$ (and other
+quantities that are functions of time) could vary more quickly than
+the standard LSST exposure time of 15s, it is assumed that all such
+quantities are averaged over that short exposure time, so that $t$
+refers to quantities that can vary from exposure to exposure. }, the specific flux of an 
+astronomical object at the top of the atmosphere. In general this can be 
+approximated by $F_b(t)$, the above-atmosphere flux as would be seen through a
+standard bandpass, $b$. For LSST, we will have six `standard' bandpasses, $u\lsst$,
+$g\lsst$, $r\lsst$, $i\lsst$, $z\lsst$, $y\lsst$, defined during commissioning, that combine
+a standardized atmosphere, mirror, lens, and filter transmission curves with a standardized QE
+curve for the detector. 
+
+This above-atmosphere flux can be converted to the AB magnitude system by
+\begin{equation}
+m_b^{std} = -2.5 \, log_{10}  \left( {F_b^{std} \over F_{AB}}  \right)
+\end{equation}
+where $F_{AB}$ = 3631 Jy.
+
+
+\section{Instrumental Magnitude}
+
+An instrumental magnitude is familiar to most astronomers and is fairly straightward to conceptualize:
+it's simply $-2.5\,log_{10}$ of the counts received in the detector. 
+\begin{equation}
+m_b^{inst} = -2.5\,log_{10}(C_b)  
+\end{equation}
+where $C_b$ is the counts received in the detector in a particular observed bandpass $b$. The bandpass 
+can change in shape (due to variations across the field of view or atmospheric transmission curves) and it can 
+change in absolute transmission throughput (due to clouds or dust on the mirrors), both of which will affect the
+number of counts seen in the detector.  The expected number of counts for a particular source and bandpass can be 
+calculated as follows: 
+\begin{equation}
+\label{eqn:Fpupil2counts}
+    C_b(alt, az, x,y,t) = C' \, \int_0^\infty {F_\nu(\lambda,t)  \, S^{atm}(\lambda,alt,az,t) \, S_b^{sys}(\lambda,x,y,t) \lambda^{-1}d\lambda}.
+\end{equation}
+The term $\lambda^{-1}$ comes from the conversion of energy per unit frequency
+into the number of photons per unit wavelength. The dimensional conversion constant $C'$ is
+\begin{equation}
+\label{eqn:Cconstant}
+        C' = {\pi D^2 \Delta t \over 4 g h }  
+\end{equation}
+where $D$ is the effective primary mirror diameter, $\Delta t$ is the
+exposure time, $g$ is the gain of the readout electronics (number of
+photoelectrons per ADU count, a number greater than one), and $h$ is
+the Planck constant. 
+Here, $S_b^{sys}(\lambda,x,y,t)$ is the (dimensionless) probability that a photon will pass through the telescope's optical path to be converted into an ADU count, and includes the mirror reflectivity, lens transmission, filter transmision, and detector sensitivity.  $S^{atm}(\lambda,alt,az)$ is the (dimensionless) probability that a photon of wavelength $\lambda$ makes it through the atmosphere, and can be further broken down as
+\begin{equation}
+\label{eqn:atmTau}
+   S^{atm}(\lambda,alt,az,t)   = {\rm e}^{-\tau^{atm}(\lambda,alt,az,t)}.
+\end{equation}
+Here $\tau^{atm}(\lambda,alt,az)$ is the optical depth of the
+atmospheric layer at wavelength $\lambda$ towards the position
+($alt$,$az$).
+
+We can convert this measured quantity $m_b^{inst}$ into $m_b^{std}$ by applying a zeropoint term, 
+\begin{equation}
+\label{eqn:instMag}
+m_b^{std} = m_b^{inst} + {Z'}_b^{obs}(\lambda, t)
+\end{equation}
+where ${Z'}_b^{obs}$ must vary from observation to observation and also depends on the shape of the 
+observed bandpass (compared to the standardized bandpass) and the shape of the source SED. 
+
+
+\section{Natural magnitudes}
+
+On the other hand, a natural magnitude is more or less what generally ends up being reported by surveys: it's basically the instrumental magnitude corrected for the gray-scale portion of the zeropoint term above: 
+\begin{equation}
+m_b^{nat} = m_b^{inst} + Z_b^{obs}
+\end{equation}
+where $Z_b^{obs}$ is 
+\begin{equation}
+Z_b^{obs} =  {Z'}_b^{obs} -  \Delta m_b^{obs}
+\end{equation}
+and $m_b^{obs}$ is a term that contains only wavelength-dependent changes in the instrumental magnitude and depends on both the actual bandpass shape and the SED of the source. 
+
+The natural magnitude can be calculated from a knowledge of the SED and the observed bandpass as follows: 
+\begin{equation}
+m_b^{nat}  = -2.5\,log_{10} \left( { \int_0^\infty {F_\nu(\lambda,t) \,\phi_b^{obs}(\lambda,t) \, d\lambda} } \right)
+\end{equation}
+where $\phi_b^{obs}$ is defined as
+\begin{equation}
+\label{eqn:PhiDef}
+   \phi_b^{obs}(\lambda,t) =  {
+     {S^{atm}(\lambda,alt,az,t)\, S_b^{sys}(\lambda,x,y,t) \,
+       \lambda^{-1}} \over
+     \int_0^\infty { {S^{atm}(\lambda,alt,az,t) \,
+         S_b^{sys}(\lambda,x,y,t) \, \lambda^{-1}} \,d\lambda}}.
+\end{equation}
+Note that $\phi_b$ only represents {\it shape} information about the
+bandpass, as by definition
+\begin{equation}
+\int_0^\infty {\phi_b(\lambda)  d\lambda}=1. 
+\end{equation}
+This means that any gray-scale changes in the bandpass (changes in overall throughput) will not affect the calculated $m_b^{nat}$. 
+
+From the equations above, and bringing in the idea of the standard bandpass and corresponding standard $\phi_b^{std}(\lambda)$, we can see that
+\begin{eqnarray}
+m_b^{nat} & = & -2.5 \, log_{10} \left( { \int_0^\infty {F_\nu(\lambda,t) \,
+    \phi_b^{obs}(\lambda,t) \, d\lambda} \over F_{AB} }  \right) \\
+& = & -2.5 \, log_{10} \, \left( \left( { \int_0^\infty {F_\nu(\lambda,t) \,
+    \phi_b^{obs}(\lambda,t) \, d\lambda} \over \int_0^\infty {F_\nu(\lambda,t) \,
+    \phi_b^{std}(\lambda,t) \, d\lambda}} \right) \, \left( {\int_0^\infty {F_\nu(\lambda,t) \,
+    \phi_b^{std}(\lambda,t) \, d\lambda} \over F_{AB}} \right) \right) \\
+m_b^{nat} & = & \Delta m_b^{obs} + m_b^{std} 
+\end{eqnarray}
+where $\Delta m_b^{obs}$ is defined as 
+\begin{equation}
+\Delta m_b^{obs} = -2.5\, log_{10} \left( { \int_0^\infty {F_\nu(\lambda,t) \,
+    \phi_b^{obs}(\lambda,t) \, d\lambda} \over \int_0^\infty {F_\nu(\lambda,t) \,
+    \phi_b^{std}(\lambda,t) \, d\lambda}} \right) 
+\end{equation}
+
+\clearpage
+\section{Summary}
+
+I may have gotten a little wordy above. Here's the summary: 
+\begin{itemize}
+\item{Instrumental Magnitude}
+\begin{eqnarray}
+m_b^{inst} & =  & -2.5\,log_{10}(C_b)  \\
+m_b^{std} & = & m_b^{inst} + {Z'}_b^{obs}(\lambda, t) \\
+                 & = & m_b^{inst} + Z_b^{obs}(t) + \Delta m_b^{obs}(\lambda, t)
+\end{eqnarray}
+\item{Natural Magnitude}
+\begin{eqnarray}
+m_b^{nat} & = & -2.5\,log_{10} \left( { \int_0^\infty {F_\nu(\lambda,t) \,\phi_b^{obs}(\lambda,t) \, d\lambda} } \right) \\ 
+ \phi_b^{obs}(\lambda,t) & = &  {
+     {S^{atm}(\lambda,alt,az,t)\, S_b^{sys}(\lambda,x,y,t) \,
+       \lambda^{-1}} \over
+     \int_0^\infty { {S^{atm}(\lambda,alt,az,t) \,
+         S_b^{sys}(\lambda,x,y,t) \, \lambda^{-1}} \,d\lambda}} \\
+m_b^{std} & = & m_b^{nat} + \Delta m_b^{obs}(\lambda, t) 
+\end{eqnarray}
+\end{itemize}
+
+$Z_b^{obs}$ and $\Delta m_b^{obs}$ are calculated from 
+\begin{eqnarray}
+Z_b^{obs} & = & -2.5\,log_{10} \left( {\int_0^\infty {S^{atm}(\lambda,alt,az,t) \, S_b^{sys}(\lambda,x,y,t) \lambda^{-1}d\lambda} } \right) \\
+\Delta m_b^{obs} & = &-2.5\, log_{10} \left( { \int_0^\infty {F_\nu(\lambda,t) \,
+    \phi_b^{obs}(\lambda,t) \, d\lambda} \over \int_0^\infty {F_\nu(\lambda,t) \,
+    \phi_b^{std}(\lambda,t) \, d\lambda}} \right),
+\end{eqnarray}
+thus setting the zeropoint $Z_b^{obs}(t)$ from the number of counts expected by a constant, flat $F_\nu(\lambda) = F_{AB}$ source and the $\Delta  m_b^{obs}(\lambda, t)$ value by the difference in shape between the standard bandpass and the observed bandpass combined with the SED of the source. 
+
+Even with a non-variable source (assuming it's not a flat $F_\nu(\lambda)$ SED), the natural magnitudes will change as the shape of the bandpass changes (due to atmospheric effects or changes in the location in the focal plane), while the instrumental magnitudes will change with both the shape of the bandpass and the overall throughput.  
+
+\end{document}
