@@ -391,15 +391,21 @@ class Bandpass:
         seeing and platescale are also necessary. """
         # This calculation comes from equation #42 in the SNR document.
         snr = 5.0
-        noise_instr = numpy.sqrt(nexp*readnoise**2 + darkcurrent*expTime*nexp + nexp*othernoise**2)
+        # Calculate the instrument noise in electrons, allowing for potential undersampling of readnoise.
+        #totalreadnoise = (numpy.sqrt(readnoise**2 + othernoise**2 + (0.5*gain)**2))
+        totalreadnoise = (numpy.sqrt(readnoise**2 + othernoise**2))
+        noise_instr = numpy.sqrt(nexp*totalreadnoise**2 + darkcurrent*expTime*nexp)
+        # Convert instrument noise to ADU.
+        noise_instr = noise_instr / gain
         neff = 2.436 * (seeing/platescale)**2
         # Calculate the sky counts. Note that the atmosphere should not be included in sky counts.
         skycounts = skysed.calcADU(hardware, expTime=expTime*nexp, effarea=effarea, gain=gain)
         skycounts = skycounts * platescale * platescale
-        # Calculate the sky noise.
+        # Calculate the sky noise in ADU.
         skynoise  = numpy.sqrt(skycounts/gain)
         v_n = neff* (skynoise**2 + noise_instr**2)
-        counts_5sigma = (snr**2)/2.0/gain + numpy.sqrt((snr**4)/4.0/gain + (snr**2)*v_n)
+        # Calculate the counts equivalent to SNR = snr - counts in ADU.
+        counts_5sigma = (snr**2)/2.0/gain + numpy.sqrt((snr**4)/4.0/gain**2 + (snr**2)*v_n)
         # Create a flat fnu source that has the required counts (in electrons) in this bandpass.
         flatsource = Sed.Sed()
         flatsource.setFlatSED()
@@ -408,7 +414,6 @@ class Bandpass:
         # Calculate the AB magnitude of this source.
         mag_5sigma = flatsource.calcMag(self)
         return mag_5sigma
-
 
     def calcEffWavelen(self):
         """Calculate effective wavelengths for filters"""
