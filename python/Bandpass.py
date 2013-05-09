@@ -66,9 +66,9 @@ EXPTIME = 15                      # Default exposure time. (option for method ca
 NEXP = 2                          # Default number of exposures. (option for methods).
 EFFAREA = numpy.pi*(6.5*100/2.0)**2   # Default effective area of primary mirror. (option for methods).
 GAIN = 2.3                        # Default gain. (option for method call).
-RDNOISE = 5                       # Default value - readnoise electrons or adu per pixel (per exposure)
-DARKCURRENT = 0.2                 # Default value - dark current electrons or adu per pixel per second
-OTHERNOISE = 4.69                 # Default value - other noise electrons or adu per pixel per exposure
+RDNOISE = 5                       # Default value - readnoise electrons per pixel (per exposure)
+DARKCURRENT = 0.2                 # Default value - dark current electrons per pixel per second
+OTHERNOISE = 4.69                 # Default value - other noise electrons per pixel per exposure
 PLATESCALE = 0.2                  # Default value - "/pixel
 SEEING = {'u': 0.77, 'g':0.73, 'r':0.70, 'i':0.67, 'z':0.65, 'y':0.63, 'y3':0.63, 'y4':0.63}  # Default seeing values (in ")
 
@@ -145,7 +145,7 @@ class Bandpass:
         self.phi = None
         # Set sb.
         self.sb = numpy.zeros(len(self.wavelen), dtype='float')
-        self.sb[abs(self.wavelen-imsimwavelen)<wavelen_step/2.0] = 1.0
+        self.sb[abs(self.wavelen-imsimwavelen)<self.wavelen_step/2.0] = 1.0
         return
 
     def readThroughput(self, filename, wavelen_min=None, wavelen_max=None, wavelen_step=None, verbose=False):
@@ -398,7 +398,8 @@ class Bandpass:
         
         Pass into this function the bandpass, hardware only of bandpass, and sky sed objects.
         The exposure time, nexp, readnoise, darkcurrent, gain,
-        seeing and platescale are also necessary. """
+        seeing and platescale are also necessary. 
+        Readnoise, darkcurrent and 'othernoise' should be in ELECTRONS. """
         if seeing == None:
             seeing = SEEING[filter]
         # This calculation comes from equation #42 in the SNR document.
@@ -410,7 +411,7 @@ class Bandpass:
         # Convert instrument noise to ADU.
         noise_instr = noise_instr / gain
         neff = 2.436 * (seeing/platescale)**2
-        # Calculate the sky counts. Note that the atmosphere should not be included in sky counts.
+        # Calculate the sky counts in ADU. Note that the atmosphere should not be included in sky counts.
         skycounts = skysed.calcADU(hardware, expTime=expTime*nexp, effarea=effarea, gain=gain)
         skycounts = skycounts * platescale * platescale
         # Calculate the sky noise in ADU.
