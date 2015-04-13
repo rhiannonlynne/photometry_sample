@@ -23,7 +23,8 @@
 import os
 from copy import deepcopy
 import numpy
-import pylab
+import matplotlib.pyplot as plt
+import matplotlib.lines as mlines
 from Sed import Sed
 from Bandpass import Bandpass
 
@@ -135,30 +136,30 @@ def plotBandpasses(bandpassDict, titletext=None, newfig=True, savefig=False, add
     """Plot the bandpass throughput curves. """
     # Generate a new figure, if desired. 
     if newfig: 
-        pylab.figure()
+        plt.figure()
     # Plot the bandpass curves. 
     for f in bandpassDict.keys():
-        pylab.plot(bandpassDict[f].wavelen, bandpassDict[f].sb, marker="", linestyle=linestyle, 
+        plt.plot(bandpassDict[f].wavelen, bandpassDict[f].sb, marker="", linestyle=linestyle, 
                    linewidth=linewidth, label=f)
     # Only draw the legend if desired (many bandpassDicts plotted together could make the legend unwieldy).
     if addlegend:
-        pylab.legend(numpoints=1, fancybox=True, shadow=True)
+        plt.legend(numpoints=1, fancybox=True, shadow=True)
     # Limit wavelengths to the LSST range. 
-    pylab.xlim(300, 1150)
-    pylab.xlabel('Wavelength (nm)')
-    pylab.ylabel('Throughput')
+    plt.xlim(300, 1150)
+    plt.xlabel('Wavelength (nm)')
+    plt.ylabel('Throughput')
     if newfig:
         # Only add the grid if it's a new figure (otherwise, it toggles on/off).
-        pylab.grid()
+        plt.grid()
     # Add a plot title.
     if titletext != None:
-        pylab.title(titletext)
+        plt.title(titletext)
     # Save the figure, if desired.
     if savefig:
         if titletext!=None:
-            pylab.savefig('%s.%s' %(titletext, figformat), format=figformat)
+            plt.savefig('%s.%s' %(titletext, figformat), format=figformat)
         else:
-            pylab.savefig('throughputs.%s' %(titletext, figformat), format=figformat)
+            plt.savefig('throughputs.%s' %(titletext, figformat), format=figformat)
     return
         
 
@@ -371,19 +372,46 @@ def plotDmags(sedlists, gi, dmags, newfig=True, titletext=None, savefig=False,
     symbs = {'quasar':'o', 'stars':'s', 'sn':'x', 'galaxies':'+', 'photoZ_outliers':'*', 'any':'^'}
     colors = {'quasar':'g', 'stars':'k', 'sn':'b', 'galaxies':'r', 'photoZ_outliers':'m', 'any':'k'}
     if newfig:
-        pylab.figure()
-    pylab.subplots_adjust(top=0.93, wspace=0.32, hspace=0.32, bottom=0.09, left=0.12, right=0.96)
+        plt.figure()
+    plt.subplots_adjust(top=0.93, wspace=0.32, hspace=0.32, bottom=0.09, left=0.12, right=0.96)
     for f, i in zip(filterlist, range(1, len(filterlist)+1)):
-        pylab.subplot(3,2,i)
+        plt.subplot(3,2,i)
         for objtype in sedlists.keys():
             for s in sedlists[objtype]:
-                pylab.plot(gi[s], dmags[s][f], color=colors[objtype], marker=symbs[objtype])
-        pylab.xlabel('g-i')
-        pylab.ylabel(r'$\Delta$%s (mmag)' %(f))
-    pylab.suptitle(titletext)
+                plt.plot(gi[s], dmags[s][f], color=colors[objtype], marker=symbs[objtype])
+        plt.xlabel('g-i')
+        plt.ylabel(r'$\Delta$%s (mmag)' %(f))
+    plt.suptitle(titletext)
     if savefig:
         if titletext != None:
-            pylab.savefig('%s.%s' %(titletext, figformat), format=figformat)
+            plt.savefig('%s.%s' %(titletext, figformat), format=figformat)
         else:
-            pylab.savefig('Dmag.%s' %(figformat), format=figformat)
+            plt.savefig('Dmag.%s' %(figformat), format=figformat)
+    return
+
+
+def plotDmagsSingle(sedlists, gi, dmags, plotFilter='u', newfig=True, titletext=None, savefig=False):
+    """Generate a plot of the change in magnitudes, in a single filter only. """
+    symbs = {'quasar':'o', 'stars':'s', 'sn':'x', 'galaxies':'+', 'photoZ_outliers':'*', 'any':'^'}
+    colors = {'quasar':'g', 'stars':'k', 'sn':'b', 'galaxies':'r', 'photoZ_outliers':'m', 'any':'k'}
+    if newfig:
+        plt.figure()
+    f = plotFilter
+    for objtype in sedlists.keys():
+        for s in sedlists[objtype]:
+            plt.plot(gi[s], dmags[s][f], color=colors[objtype], marker=symbs[objtype])
+    plt.xlabel('g-i')
+    plt.ylabel(r'$\Delta$%s (mmag)' %(f))
+    plt.title(titletext)
+    handles= []
+    for s in symbs:
+        if s != 'any':
+            myline = mlines.Line2D([], [], color=colors[s], marker=symbs[s], linestyle='', label=s)
+            handles.append(myline)
+    plt.legend(handles=handles, loc=(0.9, .2), fontsize='small', numpoints=1, fancybox=True)
+    if savefig:
+        if titletext != None:
+            plt.savefig('%s.%s' %(titletext, figformat), format=figformat)
+        else:
+            plt.savefig('Dmag.%s' %(figformat), format=figformat)
     return
