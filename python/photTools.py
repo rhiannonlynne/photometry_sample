@@ -1,7 +1,7 @@
-# 
+#
 # LSST Data Management System
 # Copyright 2008, 2009, 2010, 2011, 2012 LSST Corporation.
-# 
+#
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
 #
@@ -9,14 +9,14 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
-# You should have received a copy of the LSST License Statement and 
-# the GNU General Public License along with this program.  If not, 
+#
+# You should have received a copy of the LSST License Statement and
+# the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
@@ -30,14 +30,14 @@ from Bandpass import Bandpass
 
 # These are some convenience functions to access Bandpass and Sed with some of the 'bulk'
 # functionality that seemed like it would be useful in engineering tests.
-# Please feel free to add to this or to send me suggestions. 
+# Please feel free to add to this or to send me suggestions.
 
 # Note that the way these functions are set up is not optimal for large numbers of
 # SEDs, but for the few which are stored within the photometry_sample directories, this works well.
 
 figformat = 'png'
 
-EXPTIME = 15                      # Default exposure time. (option for method calls).                   
+EXPTIME = 15                      # Default exposure time. (option for method calls).
 NEXP = 2                          # Default number of exposures. (option for methods).
 EFFAREA = numpy.pi*(6.5*100/2.0)**2   # Default effective area of primary mirror. (option for methods).
 GAIN = 2.3                        # Default gain. (option for method call).
@@ -45,7 +45,7 @@ RDNOISE = 5                       # Default value - readnoise electrons or adu p
 DARKCURRENT = 0.2                 # Default value - dark current electrons or adu per pixel per second
 OTHERNOISE = 4.69                 # Default value - other noise electrons or adu per pixel per exposure
 PLATESCALE = 0.2                  # Default value - "/pixel
-SEEING = {'u': 0.77, 'g':0.73, 'r':0.70, 'i':0.67, 'z':0.65, 'y':0.63}  # Default seeing values (in ")     
+SEEING = {'u': 0.77, 'g':0.73, 'r':0.70, 'i':0.67, 'z':0.65, 'y':0.63}  # Default seeing values (in ")
 
 
 def readBandpasses(filterlist=('u', 'g', 'r', 'i', 'z', 'y'),
@@ -134,17 +134,17 @@ def multiplyBandpassDict(bandpassDict1, bandpassDict2):
 def plotBandpasses(bandpassDict, titletext=None, newfig=True, savefig=False, addlegend=True,
                    linestyle='-', linewidth=2):
     """Plot the bandpass throughput curves. """
-    # Generate a new figure, if desired. 
-    if newfig: 
+    # Generate a new figure, if desired.
+    if newfig:
         plt.figure()
-    # Plot the bandpass curves. 
+    # Plot the bandpass curves.
     for f in bandpassDict.keys():
-        plt.plot(bandpassDict[f].wavelen, bandpassDict[f].sb, marker="", linestyle=linestyle, 
+        plt.plot(bandpassDict[f].wavelen, bandpassDict[f].sb, marker="", linestyle=linestyle,
                    linewidth=linewidth, label=f)
     # Only draw the legend if desired (many bandpassDicts plotted together could make the legend unwieldy).
     if addlegend:
         plt.legend(numpoints=1, fancybox=True, shadow=True)
-    # Limit wavelengths to the LSST range. 
+    # Limit wavelengths to the LSST range.
     plt.xlim(300, 1150)
     plt.xlabel('Wavelength (nm)')
     plt.ylabel('Throughput')
@@ -161,14 +161,14 @@ def plotBandpasses(bandpassDict, titletext=None, newfig=True, savefig=False, add
         else:
             plt.savefig('throughputs.%s' %(titletext, figformat), format=figformat)
     return
-        
+
 
 def readPhotSeds(sedDir=None):
     """Read all the seds provided by this package, storing them in a
     dictionary and saving lists of the SEDs of each type (so that
     they can be separated later if desired). """
     # The environment variable PHOT_REF_SEDS_DIR is set if the file
-    #  'phot_ref.csh' is sourced. 
+    #  'phot_ref.csh' is sourced.
     if sedDir == None:
         sedDir = os.getenv('PHOT_REF_SEDS_DIR')
     # Again, if this was not set .. try defaulting to current directory.
@@ -182,6 +182,8 @@ def readPhotSeds(sedDir=None):
     sedlists['stars'] = ['km10_7250.fits_g45', 'km10_6500.fits_g45',
                          'km10_6000.fits_g45', 'km10_5250.fits_g45',
                          'km10_4500.fits_g45', 'm3.0Full.dat']
+    sedlists['white_dwarf'] = ['wd_H_100000_80.dat', 'wd_H_15000_80.dat', 'wd_H_50000_80.dat',
+                               'wd_H_5500_80.dat', 'wd_He_10000_80.dat', 'wd_He_15000_80.dat', 'wd_He_5500_80.dat']
     sedlists['sn'] = ['sn1a_15.0.dat', 'sn1a_20.0.dat', 'sn1a_10.0.dat']
     sedlists['galaxies'] = ['Sa_template_norm.sed.dat', 'Sdm_template_norm.sed0.dat',
                             'Ell2_template_norm.sed.dat']
@@ -197,23 +199,23 @@ def readPhotSeds(sedDir=None):
             sedDict[s] = Sed()
             sedDict[s].readSED_flambda(os.path.join(sedDir, objtype, s))
     # Return the sed dictionary and the dictionary containing the lists of each
-    #  type of object. 
+    #  type of object.
     return sedDict, sedlists
 
 def readAnySeds(inputfileList, sedDir=None):
-    """Read the seds in a list and store them in a format appropriate for use with the 
+    """Read the seds in a list and store them in a format appropriate for use with the
     rest of these routines. sedDir (if set) can be the root directory for the files in the list."""
-    # Set up the sedlists dictionary to hold the sed names. We'll store them all keyed under 'any'. 
+    # Set up the sedlists dictionary to hold the sed names. We'll store them all keyed under 'any'.
     sedlists = {}
     sedlists['any'] = deepcopy(inputfileList)
-    # If the root directory is set, add it to the input file names. 
+    # If the root directory is set, add it to the input file names.
     if sedDir != None:
-        ifiles = []    
+        ifiles = []
         for i in inputfileList:
             ifiles.append(os.path.join(sedDir, i))
         inputfileList = ifiles
     # Read the files.
-    sedDict = {} 
+    sedDict = {}
     for filename, s in zip(inputfileList, sedlists['any']):
         sedDict[s] = Sed()
         sedDict[s].readSED_flambda(filename)
@@ -228,16 +230,16 @@ def makeRedshiftedSeds(sedDict, sedlists, redshifts):
     those redshifts are applied to those objects only. """
     # Check what kind of redshift object we received.
     if isinstance(redshifts, dict):
-        # Loop over all the object types in the redshift dictionary. 
+        # Loop over all the object types in the redshift dictionary.
         for objtype in redshifts.keys():
-            # Then loop over all redshifts for this type. 
+            # Then loop over all redshifts for this type.
             newSedsForList = []
             for z in redshifts[objtype]:
-                # And add new SEDs redshifted to this z for this type of object. 
+                # And add new SEDs redshifted to this z for this type of object.
                 for s in sedlists[objtype]:
-                    # Make the new name for the new SED at this redshift. 
+                    # Make the new name for the new SED at this redshift.
                     newsedname = s + '_Z_%.3f' %(z)
-                    # Add it to the SED dictionary. 
+                    # Add it to the SED dictionary.
                     sedDict[newsedname] = redshiftSingleSED(sedDict[s], z)
                     newSedsForList.append(newsedname)
             # Done redshifting all objects of this type; updated sedlist.
@@ -276,9 +278,9 @@ def matchSedsBp(sedDict, bpDict, refFilter=None):
     for f in bpDict.keys():
         if numpy.any(bpDict[f].wavelen != wavelen_match):
             bpDict[f].resampleBandpass(wavelen_min=wavelen_match.min(), wavelen_max=wavelen_match.max(),
-                                       wavelen_step = wavelen_match[1] - wavelen_match[0])            
-    # Check all seds in sedDict match in wavelength space. 
-    for s in sedDict.keys():    
+                                       wavelen_step = wavelen_match[1] - wavelen_match[0])
+    # Check all seds in sedDict match in wavelength space.
+    for s in sedDict.keys():
         if sedDict[s].needResample(wavelen_match=wavelen_match):
             sedDict[s].resampleSED(wavelen_match=wavelen_match)
     return sedDict, bpDict
@@ -295,13 +297,13 @@ def calcNatMags(bandpassDict, sedDict, sedlists):
             # Create a dictionary for each object to hold the multiple filter information.
             mags[s] = {}
             for f in bandpassDict.keys():
-                # Calculate the magnitudes. 
+                # Calculate the magnitudes.
                 mags[s][f] = sedDict[s].calcMag(bandpassDict[f])
     return mags
 
-def calcInstMags(bandpassDict, sedDict, sedlists, 
+def calcInstMags(bandpassDict, sedDict, sedlists,
                  expTime=EXPTIME, effarea=EFFAREA, gain=GAIN):
-    """Calculate instrumental magnitudes for each SED, in all bandpasses. 
+    """Calculate instrumental magnitudes for each SED, in all bandpasses.
     Changes in this magnitude includes gray-scale effects as well as color/wavelength dependent effects. """
     mags = {}
     for o in sedlists.keys():
@@ -348,6 +350,12 @@ def calcGiColors(mags):
         gi[s] = mags[s]['g'] - mags[s]['i']
     return gi
 
+def calcAnyColor(mags, color1, color2):
+    """Calculate any color of objects in a set of magnitudes. Specify color1 (e.g. 'g') and color2 (e.g. 'i')."""
+    color = {}
+    for s in mags.keys():
+        color[s] = mags[s][color1] - mags[s][color2]
+    return color
 
 def printDmags(sedlists, dmags, filterlist=('u', 'g', 'r', 'i', 'z', 'y')):
     """Print changes in magnitudes to the screen."""
@@ -366,21 +374,28 @@ def printDmags(sedlists, dmags, filterlist=('u', 'g', 'r', 'i', 'z', 'y')):
     return
 
 
-def plotDmags(sedlists, gi, dmags, newfig=True, titletext=None, savefig=False,
+def plotDmags(sedlists, color, dmags, colorname = 'g-i', xlim=None,
+              newfig=True, titletext=None, savefig=False,
               filterlist=('u', 'g', 'r', 'i', 'z', 'y')):
-    """Generate a plot of the change in magnitudes. """
-    symbs = {'quasar':'o', 'stars':'s', 'sn':'x', 'galaxies':'+', 'photoZ_outliers':'*', 'any':'^'}
-    colors = {'quasar':'g', 'stars':'k', 'sn':'b', 'galaxies':'r', 'photoZ_outliers':'m', 'any':'k'}
+    """Generate a plot of the change in magnitudes as a function of color. """
+    symbs = {'quasar':'o', 'stars':'*', 'white_dwarf':'*', 'sn':'x', 'galaxies':'s', 'photoZ_outliers':'+', 'any':'^'}
+    colors = {'quasar':'g', 'stars':'r', 'white_dwarf':'m','sn':'b', 'galaxies':'g', 'photoZ_outliers':'g', 'any':'k'}
+    objlist = ['quasar', 'galaxies', 'photoZ_outliers', 'sn', 'stars', 'white_dwarf']
+    for objtype in sedlists:
+        if objtype not in objlist:
+            objlist.append(objtype)
     if newfig:
         plt.figure()
     plt.subplots_adjust(top=0.93, wspace=0.32, hspace=0.32, bottom=0.09, left=0.12, right=0.96)
     for f, i in zip(filterlist, range(1, len(filterlist)+1)):
         plt.subplot(3,2,i)
-        for objtype in sedlists.keys():
+        for objtype in objlist:
             for s in sedlists[objtype]:
-                plt.plot(gi[s], dmags[s][f], color=colors[objtype], marker=symbs[objtype])
-        plt.xlabel('g-i')
+                plt.plot(color[s], dmags[s][f], color=colors[objtype], marker=symbs[objtype])
+        plt.xlabel(colorname)
         plt.ylabel(r'$\Delta$%s (mmag)' %(f))
+        if xlim is not None:
+            plt.xlim(xlim)
     plt.suptitle(titletext)
     if savefig:
         if titletext != None:
@@ -390,24 +405,27 @@ def plotDmags(sedlists, gi, dmags, newfig=True, titletext=None, savefig=False,
     return
 
 
-def plotDmagsSingle(sedlists, gi, dmags, plotFilter='u', newfig=True, titletext=None, savefig=False):
+def plotDmagsSingle(sedlists, color, dmags, colorname='g-i', plotFilter='u', newfig=True, titletext=None, savefig=False):
     """Generate a plot of the change in magnitudes, in a single filter only. """
-    symbs = {'quasar':'o', 'stars':'s', 'sn':'x', 'galaxies':'+', 'photoZ_outliers':'*', 'any':'^'}
-    colors = {'quasar':'g', 'stars':'k', 'sn':'b', 'galaxies':'r', 'photoZ_outliers':'m', 'any':'k'}
+    symbs = {'quasar':'o', 'stars':'*', 'white_dwarf':'*', 'sn':'x', 'galaxies':'s', 'photoZ_outliers':'+', 'any':'^'}
+    colors = {'quasar':'g', 'stars':'r', 'white_dwarf':'m', 'sn':'b', 'galaxies':'g', 'photoZ_outliers':'g', 'any':'k'}
+    objlist = ['quasar', 'galaxies', 'photoZ_outliers', 'sn', 'stars', 'white_dwarf']
+    for objtype in sedlists:
+        if objtype not in objlist:
+            objlist.append(objtype)
     if newfig:
         plt.figure()
     f = plotFilter
-    for objtype in sedlists.keys():
+    for objtype in objlist:
         for s in sedlists[objtype]:
-            plt.plot(gi[s], dmags[s][f], color=colors[objtype], marker=symbs[objtype])
-    plt.xlabel('g-i')
+            plt.plot(color[s], dmags[s][f], color=colors[objtype], marker=symbs[objtype])
+    plt.xlabel(colorname)
     plt.ylabel(r'$\Delta$%s (mmag)' %(f))
     plt.title(titletext)
     handles= []
-    for s in symbs:
-        if s != 'any':
-            myline = mlines.Line2D([], [], color=colors[s], marker=symbs[s], linestyle='', label=s)
-            handles.append(myline)
+    for s in objlist:
+        myline = mlines.Line2D([], [], color=colors[s], marker=symbs[s], linestyle='', label=s)
+        handles.append(myline)
     plt.legend(handles=handles, loc=(0.9, .2), fontsize='small', numpoints=1, fancybox=True)
     if savefig:
         if titletext != None:
