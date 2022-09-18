@@ -5,11 +5,9 @@ ranging and hopefully useful objects, in combination with [rubin_sim](https://gi
 
 ---
 
-This photometry_reference directory contains:
-
-- 5 subdirectories containing a sample of reference SEDs, chosen 
+This photometry_reference directory contains 5 subdirectories containing a sample of reference SEDs, chosen 
 to represent a range of different types of SEDs suitable for addresing
-various calibration questions.  These four subdirectories are: 
+various calibration questions.  These subdirectories are: 
  - galaxies (composite galaxy SEDs from Andy Connolly)
  - photoZ_outliers (containing galaxy templates which are most likely to
         result in catastrophic failures in determining redshifts 
