@@ -3,6 +3,8 @@
 This is a subset of SEDs which can be used to calculate magnitudes of some relatively widely
 ranging and hopefully useful objects, in combination with [rubin_sim](https://github.com/lsst/rubin_sim).
 
+The python package `rubin_sim` can be installed with conda from conda-forge or with pip by following the directions in this [README](https://github.com/lsst/rubin_sim). 
+
 ---
 
 This photometry_reference directory contains 5 subdirectories containing a sample of reference SEDs, chosen 
