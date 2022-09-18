@@ -1,3 +1,5 @@
+### README ###
+
 This is a subset of SEDs which can be used to calculate magnitudes of some relatively widely
 ranging and hopefully useful objects, in combination with [rubin_sim](https://github.com/lsst/rubin_sim).
 
@@ -5,21 +7,20 @@ ranging and hopefully useful objects, in combination with [rubin_sim](https://gi
 
 This photometry_reference directory contains:
 
-- ** 5 subdirectories containing a sample of reference SEDs, chosen 
+- 5 subdirectories containing a sample of reference SEDs, chosen 
 to represent a range of different types of SEDs suitable for addresing
 various calibration questions.  These four subdirectories are: 
-
-- galaxies (composite galaxy SEDs from Andy Connolly)
-- photoZ_outliers (containing galaxy templates which are most likely to
+ - galaxies (composite galaxy SEDs from Andy Connolly)
+ - photoZ_outliers (containing galaxy templates which are most likely to
         result in catastrophic failures in determining redshifts 
 	using photo-Z techniques. Templates provided by Sam Schmidt, via Tony Tyson). 
-- quasar (containing a single quasar SED which has been generated 
+ - quasar (containing a single quasar SED which has been generated 
 	by combining a composite spectrum from 2204 QSO spectra 
 	from SDSS (vanden Berk et al) with a simple model for the
 	flux behavior beyond the SDSS wavelengths, provided by Zeljko Ivezic).
-- sn (containing SN SEDs at various points in their time evolution, 
+ - sn (containing SN SEDs at various points in their time evolution, 
 	these come from the SN templates created by Peter Nugent),
-- stars (containing several stars from blue to red -- km10_7250.fits_g45 
+ - stars (containing several stars from blue to red -- km10_7250.fits_g45 
   	being the bluest and equivalent to about an F0 type main sequence
 	star [7250 indicates its effective temperature .. hotter=bluer],
 	down to the m3.0Full.dat SED which represents a red Mdwarf.
